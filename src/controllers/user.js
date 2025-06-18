@@ -1,5 +1,8 @@
 import { StatusCodes } from "http-status-codes";
 import { userService } from "../services/user.js";
+import passport from "passport";
+import GitHubStrategy from "passport-github2";
+import GoogleStrategy from "passport-google-oauth20";
 
 const getAllUsers = async (req, res, next) => {
   try {
@@ -60,9 +63,48 @@ const refreshToken = async (req, res, next) => {
   }
 };
 
+const loginGithub = async (req, res, next) => {
+  try {
+    const { user, accessToken, refreshToken } = await userService.loginGithub();
+    return res.status(StatusCodes.OK).json({
+      status: 200,
+      message: "Đăng nhập thành công",
+      content: user,
+      accessToken,
+      refreshToken,
+    });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ Error: "Server Error" });
+  }
+};
+
+const deleteUser = async (req, res, next) => {
+  try {
+    const id = req.query.id;
+    const user = await userService.deleteUser(id);
+    return res
+      .status(StatusCodes.OK)
+      .json({
+        status: 200,
+        message: "Xóa Người dùng thành công",
+        content: user,
+      });
+  } catch (error) {
+    console.log(error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ Error: "Server Error" });
+  }
+};
+
 export const userController = {
   getAllUsers,
   register,
   login,
+  loginGithub,
   refreshToken,
+  deleteUser,
 };

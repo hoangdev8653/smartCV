@@ -5,6 +5,8 @@ import { connectDB } from "./configs/connectDb.js";
 import { corsOptions } from "./configs/cors.js";
 import cors from "cors";
 import dotenv from "dotenv";
+import passport from "passport";
+import session from "express-session";
 import { routers } from "./routers/index.js";
 dotenv.config();
 
@@ -17,6 +19,16 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
+app.use(
+  session({
+    secret: "your_secret_key",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
 app.use("/user", routers.user);
 
 app.get("/", (req, res) => {
